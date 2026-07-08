@@ -18,11 +18,11 @@ from .coordinator import JdSmartConfigEntry
 from .entity import JdSmartEntity
 
 MODE_TO_HVAC = {
-    "0": HVACMode.COOL,
-    "1": HVACMode.HEAT,
-    "2": HVACMode.DRY,
-    "3": HVACMode.FAN_ONLY,
-    "4": HVACMode.AUTO,
+    "0": HVACMode.AUTO,
+    "1": HVACMode.COOL,
+    "2": HVACMode.HEAT,
+    "3": HVACMode.DRY,
+    "4": HVACMode.FAN_ONLY,
 }
 HVAC_TO_MODE = {value: key for key, value in MODE_TO_HVAC.items()}
 
@@ -82,7 +82,7 @@ class JdSmartClimate(JdSmartEntity, ClimateEntity):
     _attr_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_min_temp = 18
     _attr_max_temp = 32
-    _attr_target_temperature_step = 1
+    _attr_target_temperature_step = 0.1
     _attr_hvac_modes = [
         HVACMode.OFF,
         HVACMode.HEAT,
@@ -103,38 +103,40 @@ class JdSmartClimate(JdSmartEntity, ClimateEntity):
     @property
     def current_temperature(self) -> float | None:
         """Return current temperature."""
-        return _float_or_none(self.streams.get("curtemp"))
+        return _float_or_none(self.streams.get("CurrentTemperature"))
 
     @property
     def target_temperature(self) -> float | None:
         """Return target temperature."""
-        return _float_or_none(self.streams.get("settemp"))
+        return _float_or_none(self.streams.get("TemperatureSet"))
 
     @property
     def current_humidity(self) -> float | None:
         """Return current humidity."""
+        # 你的设备无此字段，会一直返回None，属正常现象
         return _float_or_none(self.streams.get("curhum"))
 
     @property
     def hvac_mode(self) -> HVACMode | None:
         """Return HVAC mode."""
-        if self.streams.get("power") == "0":
+        if self.streams.get("Power") == "0":
             return HVACMode.OFF
-        return MODE_TO_HVAC.get(self.streams.get("mode", ""))
+        return MODE_TO_HVAC.get(self.streams.get("Mode", ""))
 
     @property
     def fan_mode(self) -> str | None:
         """Return fan mode."""
-        return VALUE_TO_FAN.get(self.streams.get("mark", ""))
+        return VALUE_TO_FAN.get(self.streams.get("Wind", ""))
 
     @property
     def swing_mode(self) -> str | None:
         """Return swing mode."""
-        return VALUE_TO_SWING.get(self.streams.get("verdir", ""))
+        return VALUE_TO_SWING.get(self.streams.get("Vertical", ""))
 
     @property
     def preset_mode(self) -> str | None:
         """Return preset mode."""
+        # 你的设备无sleepmode字段，会一直返回None，属正常现象
         return VALUE_TO_PRESET.get(self.streams.get("sleepmode", ""))
 
     async def async_set_temperature(self, **kwargs: Any) -> None:
@@ -142,28 +144,28 @@ class JdSmartClimate(JdSmartEntity, ClimateEntity):
         temperature = kwargs.get(ATTR_TEMPERATURE)
         if temperature is None:
             return
-        await self._control({"settemp": int(temperature)})
+        await self._control({"TemperatureSet": float(temperature)})
 
     async def async_set_hvac_mode(self, hvac_mode: HVACMode) -> None:
         """Set HVAC mode."""
         if hvac_mode == HVACMode.OFF:
-            await self._control({"power": 0})
+            await self._control({"Power": 0})
             return
         mode = HVAC_TO_MODE[hvac_mode]
-        await self._control({"power": 1, "mode": int(mode)})
+        await self._control({"Power": 1, "Mode": int(mode)})
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         """Set fan mode."""
-        await self._control({"mark": int(FAN_TO_VALUE[fan_mode])})
+        await self._control({"Wind": int(FAN_TO_VALUE[fan_mode])})
 
     async def async_set_swing_mode(self, swing_mode: str) -> None:
         """Set swing mode."""
-        await self._control({"verdir": int(SWING_TO_VALUE[swing_mode])})
+        await self._control({"Vertical": int(SWING_TO_VALUE[swing_mode])})
 
     async def async_set_preset_mode(self, preset_mode: str) -> None:
         """Set preset mode."""
+        # 你的设备无此字段，下发会失败，建议注释或删除
         await self._control({"sleepmode": int(PRESET_TO_VALUE[preset_mode])})
-
     async def _control(self, commands: dict[str, object]) -> None:
         """Control helper."""
         try:

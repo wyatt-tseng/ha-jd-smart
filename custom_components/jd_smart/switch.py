@@ -22,11 +22,15 @@ class JdSmartSwitchDescription(SwitchEntityDescription):
 
 
 SWITCHES: tuple[JdSmartSwitchDescription, ...] = (
+    # 背光、显示字段你的设备不支持，保留会显示不可用，可注释删除
+    # JdSmartSwitchDescription(
+    #     key="bglight", stream_id="bglight", translation_key="backlight"
+    # ),
+    # JdSmartSwitchDescription(
+    #     key="scrdispaly", stream_id="scrdispaly", translation_key="display"
+    # ),
     JdSmartSwitchDescription(
-        key="bglight", stream_id="bglight", translation_key="backlight"
-    ),
-    JdSmartSwitchDescription(
-        key="scrdispaly", stream_id="scrdispaly", translation_key="display"
+        key="power", stream_id="Power", translation_key="power"
     ),
     JdSmartSwitchDescription(
         key="ecomode", stream_id="ecomode", translation_key="powerful"

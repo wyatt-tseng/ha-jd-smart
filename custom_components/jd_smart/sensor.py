@@ -27,56 +27,23 @@ class JdSmartSensorDescription(SensorEntityDescription):
 
 
 SENSORS: tuple[JdSmartSensorDescription, ...] = (
+    # 当前温度
     JdSmartSensorDescription(
-        key="curtemp",
-        stream_id="curtemp",
+        key="current_temperature",
+        stream_id="CurrentTemperature",
         translation_key="current_temperature",
         device_class=SensorDeviceClass.TEMPERATURE,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
     ),
+    # 新增：户外温度
     JdSmartSensorDescription(
-        key="curhum",
-        stream_id="curhum",
-        translation_key="current_humidity",
-        native_unit_of_measurement=PERCENTAGE,
+        key="outdoor_temperature",
+        stream_id="OutdoorTemperature",
+        translation_key="outdoor_temperature",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         state_class=SensorStateClass.MEASUREMENT,
-    ),
-    JdSmartSensorDescription(
-        key="tvoc",
-        stream_id="tvoc",
-        translation_key="tvoc",
-        entity_category=EntityCategory.DIAGNOSTIC,
-    ),
-    JdSmartSensorDescription(
-        key="time_sum",
-        stream_id="time_sum",
-        translation_key="runtime_total",
-        device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        entity_category=EntityCategory.DIAGNOSTIC,
-    ),
-    JdSmartSensorDescription(
-        key="time_clr",
-        stream_id="time_clr",
-        translation_key="clean_runtime",
-        device_class=SensorDeviceClass.DURATION,
-        native_unit_of_measurement=UnitOfTime.MINUTES,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        entity_category=EntityCategory.DIAGNOSTIC,
-    ),
-    JdSmartSensorDescription(
-        key="speaker",
-        stream_id="speaker",
-        translation_key="speaker_raw",
-        entity_category=EntityCategory.DIAGNOSTIC,
-    ),
-    JdSmartSensorDescription(
-        key="mdpmode",
-        stream_id="mdpmode",
-        translation_key="mdp_mode",
-        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     JdSmartSensorDescription(
         key="ptcheat",

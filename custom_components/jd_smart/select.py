@@ -22,13 +22,14 @@ class JdSmartSelectDescription(SelectEntityDescription):
 
 
 SELECTS: tuple[JdSmartSelectDescription, ...] = (
-    JdSmartSelectDescription(
-        key="hordir",
-        stream_id="hordir",
-        translation_key="horizontal_direction",
-        options=["swing", "direct"],
-        option_to_value={"swing": "0", "direct": "1"},
-    ),
+    # 注释/删除以下水平摆风配置
+    # JdSmartSelectDescription(
+    #     key="hordir",
+    #     stream_id="hordir",
+    #     translation_key="horizontal_direction",
+    #     options=["swing", "direct"],
+    #     option_to_value={"swing": "0", "direct": "1"},
+    # ),
 )
 
 

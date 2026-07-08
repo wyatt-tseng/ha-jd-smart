@@ -743,6 +743,7 @@ class JdSmartClient:
                 url, data=raw_body, headers=headers
             ) as response:
                 text = await response.text()
+                LOGGER.debug("【调试】接口原始响应: path=%s, body=%s", url.split("?", 1)[0], text)
                 LOGGER.debug(
                     "JD Smart response: path=%s, http_status=%s, body_length=%s",
                     url.split("?", 1)[0],
@@ -865,7 +866,9 @@ class JdSmartClient:
             "pullMode": 0,
             "version": "2.0",
         }
-        raw_body = _json_dumps({"json": inner})
+        # 核心修正：与控制接口保持一致，内层参数序列化为字符串
+        raw_body = _json_dumps({"json": _json_dumps(inner)})
+
         url = (
             f"{JD_SMART_BASE_URL}{SNAPSHOT_PATH}"
             f"?{urlencode(self._public_query())}"
@@ -875,7 +878,11 @@ class JdSmartClient:
             raw_body,
             headers=self._headers(raw_body),
         )
-        return JdSmartSnapshot.from_result(payload["result"])
+        snapshot = JdSmartSnapshot.from_result(payload["result"])
+        # 新增调试日志：打印解析结果
+        LOGGER.debug("【调试】快照解析结果: digest=%s, from_device_success=%s, streams=%s",
+                 snapshot.digest, snapshot.from_device_success, snapshot.streams)
+        return snapshot
 
     def _control_body(self, feed_id: str, commands: dict[str, Any]) -> str:
         """Build control business body."""
